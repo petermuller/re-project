@@ -9,6 +9,8 @@
 #define SERVER_H
 
 #include <string>
+#include <vector>
+#include <fstream>
 
 /** \class Server
  * \brief Collection of methods used to control a music database.
@@ -26,6 +28,11 @@ class Server
         std::string playSong(std::string);
     protected:
     private:
+        std::fstream infile;
+        std::vector<std::string> artists;
+        std::vector<std::string> songs;
+        std::vector<std::string> lengths;
+        std::vector<std::string> albums;
 };
 
 #endif // SERVER_H
