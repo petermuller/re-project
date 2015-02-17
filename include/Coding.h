@@ -22,6 +22,8 @@ class Coding
         static std::string encode(std::string);
     protected:
     private:
+        //Just another measure of encoding. Used to XOR message.
+        static const unsigned char offset = 22;
 };
 
 #endif // CODING_H

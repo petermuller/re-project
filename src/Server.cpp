@@ -57,14 +57,15 @@ Server::~Server()
 /** \brief Retrieves data from the rest of the "listXX" methods.
  *
  * \return All song database values in
- *          "[Song] by [Artist], Length: [Length], Album: [Album]" format
+ *          "[Song] by [Artist], Length: [Length], Album: [Album]" format.
+ *          There is no trailing endline.
  */
 std::string Server::listAllSongData()
 {
     std::string output;
     for (unsigned int i = 0; i<songs.size(); i++){
         output += songs.at(i) + " by " + artists.at(i) + ",\n\t Length: " \
-            + lengths.at(i) + ",\n\t Album: " + albums.at(i) + "\n\n";
+            + lengths.at(i) + ",\n\t Album: " + albums.at(i) + "\n";
     }
     return output;
 }
