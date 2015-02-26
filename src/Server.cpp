@@ -6,6 +6,7 @@
 //Peter Muller
 
 #include "Server.h"
+#include <algorithm>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -76,7 +77,22 @@ std::string Server::listAllSongData()
  */
 std::string Server::listArtists()
 {
-    return "Feature coming soon!";
+    std::string output;
+    std::vector<std::string> uarts;
+    unsigned int i;
+    for (i = 0; i<artists.size(); i++){
+        if (std::find(uarts.begin(),uarts.end(),artists.at(i))==uarts.end()){
+            //If artist not already in unique artists list
+            uarts.push_back(artists.at(i));
+        }
+    }
+    for (i = 0; i<uarts.size(); i++){
+        if (i == 0){
+            output += "Artists:\n";
+        }
+        output += "\t" + uarts.at(i) + "\n";
+    }
+    return output;
 }
 
 /** \brief Retrieves all song lengths in database.

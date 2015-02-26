@@ -14,6 +14,7 @@
 Coding::Coding()
 {
     //ctor
+    srand(time(NULL)); //seed the random function
 }
 
 Coding::~Coding()
@@ -52,7 +53,6 @@ std::string Coding::encode(std::string message)
 {
     std::string enMess; //string to return
     char num[3];
-    srand(time(NULL)); //seed the random function
     unsigned int shift = rand()%255 + 1; //cannot be 0
     unsigned int shiftS = shift; //preserve shift amount for later
     sprintf(num,"%03d",(unsigned int)shiftS);

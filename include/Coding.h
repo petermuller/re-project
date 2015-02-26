@@ -18,8 +18,8 @@ class Coding
     public:
         Coding();
         virtual ~Coding();
-        static std::string decode(std::string);
-        static std::string encode(std::string);
+        std::string decode(std::string);
+        std::string encode(std::string);
     protected:
     private:
         //Just another measure of encoding. Used to XOR message.
