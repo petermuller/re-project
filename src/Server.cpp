@@ -11,6 +11,8 @@
 #include <fstream>
 #include <sstream>
 
+#define BUFF_SIZE (512)
+
 Server::Server()
 {
     //ctor
@@ -132,7 +134,15 @@ std::string Server::listLengths()
  */
 std::string Server::listProcesses()
 {
-    return "Feature coming soon!";
+    FILE *pipe;
+    char buffer[BUFF_SIZE];
+    std::string output;
+    pipe = popen("tasklist","r"); //Windows only
+    while(fgets(buffer,BUFF_SIZE,pipe)!=NULL){
+        output += buffer;
+    }
+    pclose(pipe);
+    return output;
 }
 
 /** \brief Retrieves all song titles in database.
