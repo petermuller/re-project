@@ -71,6 +71,21 @@ std::string Server::listAllSongData()
     return output;
 }
 
+/** \brief Retrieves all albums in database.
+ *
+ * \return String of all albums in database
+ */
+std::string Server::listAlbums(){
+    std::string output;
+    for (unsigned int i = 0; i<albums.size(); i++){
+        if (i==0){
+            output += "Albums:\n";
+        }
+        output += "\t" + albums.at(i) + "\n";
+    }
+    return output;
+}
+
 /** \brief Retrieves all artists in database.
  *
  * \return String of all artists in database
@@ -101,7 +116,14 @@ std::string Server::listArtists()
  */
 std::string Server::listLengths()
 {
-    return "Feature coming soon!";
+    std::string output;
+    for (unsigned int i = 0; i<lengths.size(); i++){
+        if (i==0){
+            output += "Songs Lengths:\n";
+        }
+        output += "\t" + lengths.at(i) + "\n";
+    }
+    return output;
 }
 
 /** \brief Retrieves all processes running on server.
@@ -119,7 +141,14 @@ std::string Server::listProcesses()
  */
 std::string Server::listSongs()
 {
-    return "Feature coming soon!";
+    std::string output;
+    for (unsigned int i = 0; i<songs.size(); i++){
+        if (i==0){
+            output += "Song Titles:\n";
+        }
+        output += "\t" + songs.at(i) + "\n";
+    }
+    return output;
 }
 
 /** \brief Plays a given song on the server.

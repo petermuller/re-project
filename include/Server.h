@@ -21,6 +21,7 @@ class Server
         Server();
         virtual ~Server();
         std::string listAllSongData();
+        std::string listAlbums();
         std::string listArtists();
         std::string listLengths();
         std::string listProcesses();
