@@ -38,11 +38,9 @@
 		<Unit filename="database.txt">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="include/Client.h" />
 		<Unit filename="include/Coding.h" />
 		<Unit filename="include/Server.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/Client.cpp" />
 		<Unit filename="src/Coding.cpp" />
 		<Unit filename="src/Server.cpp" />
 		<Extensions>
