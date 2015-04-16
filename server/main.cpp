@@ -20,6 +20,10 @@ using namespace std;
 
 int main()
 {
+    //Application specific variables
+    Server serv;
+    Coding code;
+    string buffer, command;
     //Variable declarations
     WSAData wsaData; //winsock
     struct addrinfo *result = NULL; //addresses
@@ -96,10 +100,14 @@ int main()
     do {
 
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-        if (iResult > 0) {
-            printf("Bytes received: %d\n", iResult);
-
-        // Echo the buffer back to the sender
+        if (iResult > 0) { //received a byte
+            if (recvbuf[0]==0xD){ //If carriage return entered
+                command = code.decode(buffer);
+                buffer="";
+            } else {
+                buffer.push_back(recvbuf[0]);
+            }
+            // Echo the buffer back to the sender
             iSendResult = send( ClientSocket, recvbuf, iResult, 0 );
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed with error: %d\n", WSAGetLastError());
@@ -107,6 +115,7 @@ int main()
                 WSACleanup();
                 return 1;
             }
+            cout << buffer << endl;
             printf("Bytes sent: %d\n", iSendResult);
         }
         else if (iResult == 0)
