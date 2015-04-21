@@ -25,13 +25,13 @@ int main()
         cout << "1. List All Songs Information" << endl; //listAllSongData
         cout << "2. List Albums" << endl; //listAlbums
         cout << "3. List Artists" << endl; //listArtists
-        cout << "4. List Lenghts" << endl; //listLenghts
+        cout << "4. List Lengths" << endl; //listLengths
         cout << "5. List Processes" << endl <<endl; //listProcesses
         cout << "6. List All Song Titles" << endl; //listSongs
-        cout << "COMMING SOON!" << endl;
+        cout << "COMING SOON!" << endl;
         cout << "7. Upload new songs" << endl; //playSong
         cout << "8. Download songs" << endl; //playSong
-        cout << "9. Edit exsisting song" << endl; //playSong
+        cout << "9. Edit existing song" << endl; //playSong
         cout << "10. Play song" << endl << endl; //playSong
 
         cout << "opening socket!" << endl;
