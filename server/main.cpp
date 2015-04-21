@@ -23,7 +23,8 @@ int main()
     //Application specific variables
     Server serv;
     Coding code;
-    string buffer, command;
+    string buffer, command, output;
+    unsigned int comNum=7;
     //Variable declarations
     WSAData wsaData; //winsock
     struct addrinfo *result = NULL; //addresses
@@ -98,17 +99,50 @@ int main()
 
     // Receive until the peer shuts down the connection
     do {
-
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) { //received a byte
             if (recvbuf[0]==0xD){ //If carriage return entered
-                command = code.decode(buffer);
+                if(buffer.length()>0){
+                    command = code.decode(buffer);
+                    comNum = atoi(command.c_str());
+                    cout << "Received request number: " << comNum << endl;
+                    switch (comNum){
+                        case 0:
+                            output = code.encode(serv.listAllSongData());
+                            break;
+                        case 1:
+                            output = code.encode(serv.listAlbums());
+                            break;
+                        case 2:
+                            output = code.encode(serv.listArtists());
+                            break;
+                        case 3:
+                            output = code.encode(serv.listLengths());
+                            break;
+                        case 5:
+                            output = code.encode(serv.listProcesses());
+                            break;
+                        case 6:
+                            output = code.encode(serv.listSongs());
+                            break;
+                        default:
+                            output = code.encode(serv.playSong(""));
+                            break;
+                    }
+                    iSendResult = send( ClientSocket, output.c_str(), output.length(), 0 );
+                    if (iSendResult == SOCKET_ERROR) {
+                        printf("send failed with error: %d\n", WSAGetLastError());
+                        closesocket(ClientSocket);
+                        WSACleanup();
+                        return 1;
+                    }
+                }
                 buffer="";
             } else {
                 buffer.push_back(recvbuf[0]);
             }
             // Echo the buffer back to the sender
-            iSendResult = send( ClientSocket, recvbuf, iResult, 0 );
+            iSendResult = send( ClientSocket, buffer.c_str(), buffer.length(), 0 );
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed with error: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
