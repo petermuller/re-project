@@ -107,16 +107,16 @@ int main()
                     comNum = atoi(command.c_str());
                     cout << "Received request number: " << comNum << endl;
                     switch (comNum){
-                        case 0:
+                        case 1:
                             output = code.encode(serv.listAllSongData());
                             break;
-                        case 1:
+                        case 2:
                             output = code.encode(serv.listAlbums());
                             break;
-                        case 2:
+                        case 3:
                             output = code.encode(serv.listArtists());
                             break;
-                        case 3:
+                        case 4:
                             output = code.encode(serv.listLengths());
                             break;
                         case 5:
