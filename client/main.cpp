@@ -28,13 +28,11 @@ int main()
 {   //variable declarations
     WSAData wsaData; //winsock
     struct addrinfo *result = NULL; //addresses
-    struct addrinfo *ptr = NULL;
     struct addrinfo hints;
     char sendbuf = NULL;
     char recvbuf[DEF_BUFF_SIZE]; //Rx, Tx bufferse
     int iSendResult;
     int recvbuflen = DEF_BUFF_SIZE;
-    int iResult;
     SOCKET ListenSocket = INVALID_SOCKET; //Sockets
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -45,13 +43,11 @@ int main()
     cout << "opening socket!" << endl;
         //request listening socket from server (winsock client) add library libws2_32.a <-winsoc library
 
-
-
  // Initialize Winsock
     iSendResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     cout << iSendResult << endl;
-    if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
+    if (iSendResult != 0) {
+        cerr << "WSAStartup failed" << endl;
         return 1;
     }
 
@@ -63,8 +59,8 @@ int main()
 
     // Resolve the server address and port
     iSendResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-    if ( iResult != 0 ) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
+    if ( iSendResult != 0 ) {
+        cerr << "getaddrinfo failed " << endl;
         WSACleanup();
         return 1;
     }
@@ -72,7 +68,7 @@ int main()
     // Create a SOCKET for connecting to server
     ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (ListenSocket == INVALID_SOCKET) {
-        printf("socket failed with error: %ld\n", WSAGetLastError());
+        printf("socket failed with error: %d\n", WSAGetLastError());
         freeaddrinfo(result);
         WSACleanup();
         return 1;
@@ -150,7 +146,7 @@ int main()
             return 1;
     }
 
-    printf("Bytes Sent: %ld\n", iResult);
+    printf("Bytes Sent: %d\n", iSendResult);
         Sleep(180);
 
         //recieve from server (listening the
@@ -183,21 +179,21 @@ int main()
 
         iSendResult = recv(ListenSocket, recvbuf, recvbuflen, 0);
         if ( iSendResult > 0 )
-            printf("Bytes received: %d\n", iResult);
+            printf("Bytes received: %d\n", iSendResult);
         else if ( iSendResult == 0 )
             printf("Connection closed\n");
         else
             printf("recv failed with error: %d\n", WSAGetLastError());
-
-    }
+}
     while( iSendResult > 0 );
 
     // cleanup
+    cout << "closing" << endl;
     closesocket(ListenSocket);
     WSACleanup();
 
     //close socket
-    cout << "closing" << endl;
+
 
     cout << "Thank you for using ARMband Technologies!" << endl;
     cout << "Exiting...";
