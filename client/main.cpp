@@ -25,17 +25,14 @@
 using namespace std;
 
 int main()
-{
-    cout << "opening socket!" << endl;
-        //request listening socket from server (winsock client) add library libws2_32.a <-winsoc library
-    //Variable declarations
+{   //variable declarations
     WSAData wsaData; //winsock
     struct addrinfo *result = NULL; //addresses
     struct addrinfo *ptr = NULL;
     struct addrinfo hints;
-    char *sendbuf = "this is a test";
-    int iSendResult;
+    char sendbuf = NULL;
     char recvbuf[DEF_BUFF_SIZE]; //Rx, Tx bufferse
+    int iSendResult;
     int recvbuflen = DEF_BUFF_SIZE;
     int iResult;
     SOCKET ListenSocket = INVALID_SOCKET; //Sockets
@@ -45,9 +42,14 @@ int main()
     long menuOption = 99;       // option entered
     string es, ds;              //variables for (e)ncode and (d)ecode strings
     Coding c;                   // coding variable
+    cout << "opening socket!" << endl;
+        //request listening socket from server (winsock client) add library libws2_32.a <-winsoc library
+
+
 
  // Initialize Winsock
     iSendResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+    cout << iSendResult << endl;
     if (iResult != 0) {
         printf("WSAStartup failed with error: %d\n", iResult);
         return 1;
@@ -125,7 +127,6 @@ int main()
         std::ostringstream ss;  //string variable
         ss << menuOption;       //convert long to string
         string strMenuOption = ss.str(); //load it into variable to use throughout the project
-
         //test the string variable
         cout << "this is the menu option you chose: " << endl;
         cout << strMenuOption << '\n';
@@ -136,12 +137,12 @@ int main()
         cout << "Encoded string is: " << es << endl;
         Sleep(120);
 
-        //send to server (convert to string for ecoding method
+        //send to server
         cout << "Sending to server....Waiting" << endl;
-        sendbuf = es;
-        cout << "Sendbuf =" << sendbuf << endl;
+
+        cout << "Sending in buffer =" << es.c_str() << endl;
             // Send an initial buffer -----> look at additional code?
-        iSendResult = send( ListenSocket, sendbuf, (int)strlen(sendbuf), 0 );
+        iSendResult = send( ListenSocket, es.c_str(), es.length(), 0 );
         if (iSendResult == SOCKET_ERROR) {
             printf("send failed with error: %d\n", WSAGetLastError());
             closesocket(ListenSocket);
