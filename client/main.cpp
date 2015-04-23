@@ -27,12 +27,13 @@ using namespace std;
 int main()
 {   //variable declarations
     WSAData wsaData; //winsock
-    struct addrinfo *result = NULL; //addresses
+    struct addrinfo *result, *ptr = NULL; //addresses
     struct addrinfo hints;
     char sendbuf = NULL;
     char recvbuf[DEF_BUFF_SIZE]; //Rx, Tx bufferse
     int iSendResult;
     int recvbuflen = DEF_BUFF_SIZE;
+    string strMenuOption;
     SOCKET ListenSocket = INVALID_SOCKET; //Sockets
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -41,11 +42,20 @@ int main()
     string es, ds;              //variables for (e)ncode and (d)ecode strings
     Coding c;                   // coding variable
     cout << "opening socket!" << endl;
-        //request listening socket from server (winsock client) add library libws2_32.a <-winsoc library
+
+    //request listening socket from server (winsock client) add library libws2_32.a <-winsoc library
+
+    //Validate the parameters
+/*    if (argc != 2) {
+        printf("usage: %s ArmBand Technologies\n", argv[0]);
+        return 1;
+    }
+*/
+
 
  // Initialize Winsock
     iSendResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    cout << iSendResult << endl;
+    cout << "initializing WinSock... " << iSendResult << endl;
     if (iSendResult != 0) {
         cerr << "WSAStartup failed" << endl;
         return 1;
@@ -58,40 +68,45 @@ int main()
     hints.ai_flags = AI_PASSIVE;
 
     // Resolve the server address and port
-    iSendResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+    iSendResult = getaddrinfo("127.0.0.1", DEFAULT_PORT, &hints, &result);
+    cout << "    iSendResult " << iSendResult << endl;
     if ( iSendResult != 0 ) {
         cerr << "getaddrinfo failed " << endl;
         WSACleanup();
         return 1;
     }
 
-    // Create a SOCKET for connecting to server
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
-        printf("socket failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return 1;
-    }
+// Attempt to connect to an address until one succeeds
+    for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
 
-   // Setup the TCP listening socket
-    iSendResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-    if (iSendResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
+        // Create a SOCKET for connecting to server
+        ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+        cout << "Listen Socket being established.... " << ListenSocket << endl;
+        if (ListenSocket == INVALID_SOCKET) {
+            printf("socket failed with error: %d\n", WSAGetLastError());
+            freeaddrinfo(result);
+            WSACleanup();
+            return 1;
+        }
 
+       // connect to server
+        iSendResult = connect(ListenSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+        cout << "                  connected? =" << iSendResult << endl;
+         if (iSendResult == SOCKET_ERROR) {
+             cout << "Socket_error.." << endl << endl;
+            closesocket(ListenSocket);
+            ListenSocket = INVALID_SOCKET;
+            continue;
+        }
+        break;
+    }
     freeaddrinfo(result);
 
-   /* if (ListenSocket == INVALID_SOCKET) {
+   if (ListenSocket == INVALID_SOCKET) {
         printf("Unable to connect to server!\n");
         WSACleanup();
         return 1;
     }
-    */
 
     //******************
     //MENU OPTIONS HERE
@@ -104,10 +119,10 @@ int main()
         cout << "2. List Albums" << endl; //listAlbums
         cout << "3. List Artists" << endl; //listArtists
         cout << "4. List Lengths" << endl; //listLengths
-        cout << "5. List Processes" << endl <<endl; //listProcesses
+        cout << "5. List Processes" << endl; //listProcesses
         cout << "6. List All Song Titles" << endl; //listSongs
+        cout << "7. Upload new songs" << endl << endl; //addSong
         cout << "COMING SOON!" << endl;
-        cout << "7. Upload new songs" << endl; //playSong
         cout << "8. Download songs" << endl; //playSong
         cout << "9. Edit existing song" << endl; //playSong
         cout << "10. Play song" << endl << endl; //playSong
@@ -117,36 +132,58 @@ int main()
         cin >> menuOption;
         cout << endl;
 
+
+        if (menuOption=7){
+            string song, artist, lenght, album;
+            cout << "Thank you for adding to our database!" << endl;
+            cout << "Please enter the following information" << endl;
+            cout << "Song: ";
+            cin >> song;
+            cout << endl << "Artist: ";
+            cin >> artist;
+            cout << endl << "Length: ";
+            cin >> lenght;
+            cout << endl << "Album: ";
+            cin >> album;
+
+            strMenuOption = "7~" + song + "~" + artist + "~" + lenght + "~" + album;
+            cout << "user input" << strMenuOption;
+            //error checking slot
+            //we don't do error checking here.
+        }
+
         cout << "option= " << menuOption << endl;
 
         //convert number to string
         std::ostringstream ss;  //string variable
         ss << menuOption;       //convert long to string
-        string strMenuOption = ss.str(); //load it into variable to use throughout the project
+        strMenuOption = ss.str(); //load it into variable to use throughout the project
         //test the string variable
-        cout << "this is the menu option you chose: " << endl;
+        cout << "This is the menu option you chose: ";
         cout << strMenuOption << '\n';
 
         //encode option
         cout << "Encoding...." << endl;
         es = c.encode(strMenuOption);
-        cout << "Encoded string is: " << es << endl;
+        cout << "      Encoded string is: " << es << endl;
         Sleep(120);
 
         //send to server
-        cout << "Sending to server....Waiting" << endl;
+        cout << "----Sending to server....Waiting----" << endl;
 
-        cout << "Sending in buffer =" << es.c_str() << endl;
-            // Send an initial buffer -----> look at additional code?
+
+        cout << " Sending in buffer =" << es.c_str() << endl;
+
+        // Send an initial buffer -----> look at additional code?
         iSendResult = send( ListenSocket, es.c_str(), es.length(), 0 );
         if (iSendResult == SOCKET_ERROR) {
             printf("send failed with error: %d\n", WSAGetLastError());
             closesocket(ListenSocket);
             WSACleanup();
             return 1;
-    }
+        }
 
-    printf("Bytes Sent: %d\n", iSendResult);
+        printf("Bytes Sent: %d\n", iSendResult);
         Sleep(180);
 
         //recieve from server (listening the
@@ -161,9 +198,6 @@ int main()
         cout << "decoded string is " << ds << endl;
         Sleep (3600);
     }
-
-
-
 
     // shutdown the connection since no more data will be sent
     iSendResult = shutdown(ListenSocket, SD_SEND);

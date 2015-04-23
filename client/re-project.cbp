@@ -36,7 +36,7 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Linker>
-			<Add library="boost.asio" />
+			<Add library="ws2_32" />
 		</Linker>
 		<Unit filename="database.txt">
 			<Option target="&lt;{~None~}&gt;" />
