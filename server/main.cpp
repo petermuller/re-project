@@ -9,7 +9,7 @@
 
 #define DEF_BUFF_SIZE (1024)
 #define DEFAULT_PORT "9001"
- 
+
 #undef UNICODE
 #define WIN32_LEAN_AND_MEAN
 
@@ -103,8 +103,11 @@ int main()
         if (iResult > 0) { //received a byte
             buffer = std::string(recvbuf);
             if(buffer.length()>0){
+                std::string token;
                 command = code.decode(buffer);
-                comNum = atoi(command.c_str());
+                std::stringstream ss(command);
+                std::getline(command,token,'~');
+                comNum = atoi(token.c_str());
                 cout << "Command: " << command << endl << "Received request number: " << comNum << endl;
                 switch (comNum){
                     case 1:
@@ -126,7 +129,7 @@ int main()
                         output = code.encode(serv.listSongs());
                         break;
                     case 7:
-                        output = code.encode(serv.addSong("A~B~C~D"));
+                        output = code.encode(serv.addSong(command.substr(3)));
                         break;
                     default:
                         output = code.encode(serv.playSong(""));
