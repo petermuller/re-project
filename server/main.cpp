@@ -99,6 +99,7 @@ int main()
     // No longer need server socket
     closesocket(ListenSocket);
 
+    cout << "Connection established. Listening for commands..." << endl;
     // Receive until the peer shuts down the connection
     do {
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
@@ -110,7 +111,7 @@ int main()
                 std::stringstream ss(command);
                 std::getline(ss,token,'~');
                 comNum = atoi(token.c_str());
-                cout << "Command: " << command << endl << "Received request number: " << comNum << endl;
+                cout << "Received request number: " << comNum << endl;
                 switch (comNum){
                     case 1:
                         output = code.encode(serv.listAllSongData());
@@ -139,19 +140,18 @@ int main()
                 }
                 iSendResult = send( ClientSocket, output.c_str(), output.length(), 0 );
                 if (iSendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", WSAGetLastError());
+                    cerr << "Send failed with error: " << WSAGetLastError() << endl;
                     closesocket(ClientSocket);
                     WSACleanup();
                     return 1;
                 }
-                cout << "Sent " << iSendResult << " bytes to client" << endl;
-                cout << buffer << endl;
+                cout << "Sent " << iSendResult << " bytes back to client" << endl;
             }
         }
         else if (iResult == 0)
-            printf("Connection closing...\n");
+            cout << "Connection closing..." << endl;
         else  {
-            printf("recv failed with error: %d\n", WSAGetLastError());
+            cerr << "Recv failed with error: " << WSAGetLastError() << endl;
             closesocket(ClientSocket);
             WSACleanup();
             return 1;
@@ -162,7 +162,7 @@ int main()
     // shutdown the connection since we're done
     iResult = shutdown(ClientSocket, SD_SEND);
     if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
+        cerr << "shutdown failed with error: " << WSAGetLastError() << endl;
         closesocket(ClientSocket);
         WSACleanup();
         return 1;
