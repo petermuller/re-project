@@ -53,7 +53,7 @@ int main()
     // Resolve the server address and port
     iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
     if ( iResult != 0 ) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
+        cerr << "Getaddrinfo failed with error: " << iResult << endl;
         WSACleanup();
         return 1;
     }
@@ -61,7 +61,7 @@ int main()
     // Create a SOCKET for connecting to server
     ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (ListenSocket == INVALID_SOCKET) {
-        printf("socket failed with error: %d\n", WSAGetLastError());
+        cerr << "socket failed with error: " << WSAGetLastError() << endl;
         freeaddrinfo(result);
         WSACleanup();
         return 1;
@@ -70,7 +70,7 @@ int main()
     // Setup the TCP listening socket
     iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
+        cerr << "Bind failed with error: " << WSAGetLastError() << endl;
         freeaddrinfo(result);
         closesocket(ListenSocket);
         WSACleanup();
@@ -81,7 +81,7 @@ int main()
 
     iResult = listen(ListenSocket, SOMAXCONN);
     if (iResult == SOCKET_ERROR) {
-        printf("listen failed with error: %d\n", WSAGetLastError());
+        cerr << "Listen failed with error: " << WSAGetLastError() << endl;
         closesocket(ListenSocket);
         WSACleanup();
         return 1;
@@ -90,7 +90,7 @@ int main()
     // Accept a client socket
     ClientSocket = accept(ListenSocket, NULL, NULL);
     if (ClientSocket == INVALID_SOCKET) {
-        printf("accept failed with error: %d\n", WSAGetLastError());
+        cerr << "Accept failed with error: " << WSAGetLastError() << endl;
         closesocket(ListenSocket);
         WSACleanup();
         return 1;
