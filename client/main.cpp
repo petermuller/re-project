@@ -133,7 +133,7 @@ int main()
         cout << endl;
 
 
-        if (menuOption=7){
+        if (menuOption==7){
             string song, artist, lenght, album;
             cout << "Thank you for adding to our database!" << endl;
             cout << "Please enter the following information" << endl;
