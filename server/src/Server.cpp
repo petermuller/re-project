@@ -6,6 +6,7 @@
 //Peter Muller
 
 #include "Server.h"
+#include <iostream>
 #include <algorithm>
 #include <string>
 #include <fstream>
@@ -55,6 +56,45 @@ Server::~Server()
     //dtor
     //Cleanup database reader when done
     infile.close();
+}
+
+/** \brief Adds a song entry to the database.
+ *
+ * \param query - A tilde-separated string in the form of:
+ *          Song~Artist~Length~Album
+ *
+ * \return String of true or false to denote success of the operation.
+ *          A string is used for ease of encoding data for transmission.
+ */
+std::string Server::addSong(std::string query){
+    std:: string output = "true";
+    std::string token;
+    infile.open("database.txt",std::fstream::out | std::fstream::app);
+    infile << query << std::endl;
+    infile.close();
+    std::stringstream ss(query);
+    unsigned int counter = 0;
+    while(std::getline(ss,token,'~')){
+        switch (counter){
+        case 0:
+            songs.push_back(token);
+            break;
+        case 1:
+            artists.push_back(token);
+            break;
+        case 2:
+            lengths.push_back(token);
+            break;
+        case 3:
+            albums.push_back(token);
+            break;
+        default:
+            std::cerr << "Invalid input. Failing operation." << std::endl;
+            output = "false";
+            break;
+        }
+    }
+    return output;
 }
 
 /** \brief Retrieves data from the rest of the "listXX" methods.

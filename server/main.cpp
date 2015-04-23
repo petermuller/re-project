@@ -101,56 +101,47 @@ int main()
     do {
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) { //received a byte
-            if (recvbuf[0]==0xD){ //If carriage return entered
-                if(buffer.length()>0){
-                    command = code.decode(buffer);
-                    comNum = atoi(command.c_str());
-                    cout << "Received request number: " << comNum << endl;
-                    switch (comNum){
-                        case 1:
-                            output = code.encode(serv.listAllSongData());
-                            break;
-                        case 2:
-                            output = code.encode(serv.listAlbums());
-                            break;
-                        case 3:
-                            output = code.encode(serv.listArtists());
-                            break;
-                        case 4:
-                            output = code.encode(serv.listLengths());
-                            break;
-                        case 5:
-                            output = code.encode(serv.listProcesses());
-                            break;
-                        case 6:
-                            output = code.encode(serv.listSongs());
-                            break;
-                        default:
-                            output = code.encode(serv.playSong(""));
-                            break;
-                    }
-                    iSendResult = send( ClientSocket, output.c_str(), output.length(), 0 );
-                    if (iSendResult == SOCKET_ERROR) {
-                        printf("send failed with error: %d\n", WSAGetLastError());
-                        closesocket(ClientSocket);
-                        WSACleanup();
-                        return 1;
-                    }
+            buffer = std::string(recvbuf);
+            if(buffer.length()>0){
+                command = code.decode(buffer);
+                comNum = atoi(command.c_str());
+                cout << "Command: " << command << endl << "Received request number: " << comNum << endl;
+                switch (comNum){
+                    case 1:
+                        output = code.encode(serv.listAllSongData());
+                        break;
+                    case 2:
+                        output = code.encode(serv.listAlbums());
+                        break;
+                    case 3:
+                        output = code.encode(serv.listArtists());
+                        break;
+                    case 4:
+                        output = code.encode(serv.listLengths());
+                        break;
+                    case 5:
+                        output = code.encode(serv.listProcesses());
+                        break;
+                    case 6:
+                        output = code.encode(serv.listSongs());
+                        break;
+                    case 7:
+                        output = code.encode(serv.addSong("A~B~C~D"));
+                        break;
+                    default:
+                        output = code.encode(serv.playSong(""));
+                        break;
                 }
-                buffer="";
-            } else {
-                buffer.push_back(recvbuf[0]);
+                iSendResult = send( ClientSocket, output.c_str(), output.length(), 0 );
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed with error: %d\n", WSAGetLastError());
+                    closesocket(ClientSocket);
+                    WSACleanup();
+                    return 1;
+                }
+                cout << "Sent " << iSendResult << " bytes to client" << endl;
+                cout << buffer << endl;
             }
-            // Echo the buffer back to the sender
-            iSendResult = send( ClientSocket, buffer.c_str(), buffer.length(), 0 );
-            if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
-                closesocket(ClientSocket);
-                WSACleanup();
-                return 1;
-            }
-            cout << buffer << endl;
-            printf("Bytes sent: %d\n", iSendResult);
         }
         else if (iResult == 0)
             printf("Connection closing...\n");

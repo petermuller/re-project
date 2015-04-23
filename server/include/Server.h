@@ -20,6 +20,7 @@ class Server
     public:
         Server();
         virtual ~Server();
+        std::string addSong(std::string);
         std::string listAllSongData();
         std::string listAlbums();
         std::string listArtists();
