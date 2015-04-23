@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <sstream>
+#include <string>
 #include <stdlib.h>
 #include "Server.h"
 #include "Coding.h"
@@ -106,7 +108,7 @@ int main()
                 std::string token;
                 command = code.decode(buffer);
                 std::stringstream ss(command);
-                std::getline(command,token,'~');
+                std::getline(ss,token,'~');
                 comNum = atoi(token.c_str());
                 cout << "Command: " << command << endl << "Received request number: " << comNum << endl;
                 switch (comNum){
