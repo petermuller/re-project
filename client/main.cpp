@@ -42,14 +42,14 @@ int main()
     long menuOption = 99;       // option entered
     string es, ds;              //variables for (e)ncode and (d)ecode strings
     Coding c;                   // coding variable
-    cout << "opening socket!" << endl;
 
     //request listening socket from server (winsock client) add library libws2_32.a <-winsoc library
 
-
+    cout << "Welcome to ARMBand Technologies!" << endl;
+    cout << "Please enter an option to access our music database." << endl << endl;
  // Initialize Winsock
     iSendResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    cout << "initializing WinSock... " << iSendResult << endl;
+    //cout << "initializing WinSock... " << iSendResult << endl;
     if (iSendResult != 0) {
         cerr << "WSAStartup failed" << endl;
         return 1;
@@ -63,7 +63,6 @@ int main()
 
     // Resolve the server address and port
     iSendResult = getaddrinfo("127.0.0.1", DEFAULT_PORT, &hints, &result);
-    cout << "    iSendResult " << iSendResult << endl;
     if ( iSendResult != 0 ) {
         cerr << "getaddrinfo failed " << endl;
         WSACleanup();
@@ -75,7 +74,7 @@ int main()
 
         // Create a SOCKET for connecting to server
         ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-        cout << "Listen Socket being established.... " << ListenSocket << endl;
+        cout << "Connection being established.... " << endl;
         if (ListenSocket == INVALID_SOCKET) {
             printf("socket failed with error: %d\n", WSAGetLastError());
             freeaddrinfo(result);
@@ -85,7 +84,7 @@ int main()
 
        // connect to server
         iSendResult = connect(ListenSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-        cout << "                  connected? =" << iSendResult << endl;
+        //cout << "                  connected? =" << iSendResult << endl;
          if (iSendResult == SOCKET_ERROR) {
              cout << "Socket_error.." << endl << endl;
             closesocket(ListenSocket);
@@ -108,7 +107,8 @@ int main()
 
     while (menuOption > 0){
          //list the menu
-        cout << "Menu: " <<  endl;
+        cout << endl << endl;
+        cout << "Menu:" <<  endl;
         cout << "0. Exit Program" << endl;
         cout << "1. List All Songs Information" << endl; //listAllSongData
         cout << "2. List Albums" << endl; //listAlbums
@@ -127,18 +127,20 @@ int main()
         cin >> menuOption;
         cout << endl;
 
-        cout << "You entered option= " << menuOption << endl;
+        //cout << "You entered option= " << menuOption << endl;
         cin.ignore();
 
-        if ((menuOption==1)|| (menuOption==2) || (menuOption==3) || (menuOption==4) ||
-                  (menuOption==5) || (menuOption==6)){
-            //convert number to string
-            std::ostringstream ss;  //string variable
-            ss << menuOption;       //convert long to string
-            strMenuOption = ss.str(); //load it into variable to use throughout the project
-            //test the string variable
-            cout << "This is the menu option you chose: ";
-            cout << strMenuOption << endl;
+        if ((menuOption==0)){
+            //Close program if user enters 0.
+            cout << "closing" << endl;
+            closesocket(ListenSocket);
+            WSACleanup();
+
+            cout << "Thank you for using ARMband Technologies!" << endl;
+            cout << "Exiting...";
+            Sleep(3600);
+
+            return 1;
 
         }else if (menuOption==7){
             string song, artist, length, album;
@@ -167,31 +169,26 @@ int main()
             string AlbumStr(album);
 */
             strMenuOption = "7~" + song + "~" + artist + "~" + length + "~" + album + "~";
-            cout << "user input" << strMenuOption << endl << endl << endl;
 
-        }else {//close socket
-            cout << "closing" << endl;
-            closesocket(ListenSocket);
-            WSACleanup();
+        }else {//ALL OTHER NUMBERS GET SENT TO SERVER
 
-            cout << "Thank you for using ARMband Technologies!" << endl;
-            cout << "Exiting...";
-            Sleep(3600);
-
-            return 1;
+            //convert number to string
+            std::ostringstream ss;  //string variable
+            ss << menuOption;       //convert long to string
+            strMenuOption = ss.str(); //load it into variable to use throughout the project
         }
 
         //encode option
         cout << "Encoding...." << endl;
         es = c.encode(strMenuOption);
-        cout << "      Encoded string is: " << es << endl;
+        //cout << "      Encoded string is: " << es << endl;
         Sleep(120);
 
         //send to server
         cout << "----Sending to server....Waiting----" << endl;
 
 
-        cout << " Sending in buffer =" << es.c_str() << endl;
+        //cout << " Sending in buffer =" << es.c_str() << endl;
 
         // Send an initial buffer -----> look at additional code?
         iSendResult = send( ListenSocket, es.c_str(), es.length(), 0 );
@@ -210,22 +207,12 @@ int main()
         //recieve from server
 
         do{
-            cout << "Buffer is: " << iSendResult << endl;
+            //cout << "Buffer is: " << iSendResult << endl;
             iSendResult = recv(ListenSocket, recvbuf, recvbuflen, 0);
-            cout << "After, Buffer is..." << iSendResult << endl;
+            //cout << "After, Buffer is..." << iSendResult << endl;
             if (iSendResult > 0){
-                if(buffer.length()>0){
-                    int comNum;
-                    std::string token;
-                    command = code.decode(buffer);
-                    std::stringstream ss(command);
-                    std::getline(ss,token,'~');
-                    comNum = atoi(token.c_str());
-                    cout << "Received request number: " << comNum << endl;
-                }
                 cout << "Decoding..." << endl;
                 ds = c.decode(recvbuf);
-                cout << "Past the decode" << endl;
                 cout << "DS = " << ds;
                 continue;
             }
@@ -237,16 +224,7 @@ int main()
                 printf("recv failed with error: %d\n", WSAGetLastError());
         }
         while( iSendResult == DEF_BUFF_SIZE );
-
-        cout << "got to the decode";
-        //decode
-        cout << "Decoding..." << endl;
-        ds = c.decode(es);
-        Sleep (60);
-
-        cout << "decoded string is " << ds << endl;
-        Sleep (3600);
-}//end While Loop
+ }//end While Loop
 
     // shutdown the connection since no more data will be sent
     iSendResult = shutdown(ListenSocket,SD_SEND);
@@ -256,19 +234,6 @@ int main()
         WSACleanup();
         return 1;
     }
-
-    // Receive until the peer closes the connection
-    do {
-
-        iSendResult = recv(ListenSocket, recvbuf, recvbuflen, 0);
-        if ( iSendResult > 0 )
-            printf("Bytes received: %d\n", iSendResult);
-        else if ( iSendResult == 0 )
-            printf("Connection closed\n");
-        else
-            printf("recv failed with error: %d\n", WSAGetLastError());
-}
-    while( iSendResult > 0 );
 
     // cleanup
     cout << "closing" << endl;
@@ -280,5 +245,4 @@ int main()
 
     cout << "Thank you for using ARMband Technologies!" << endl;
     cout << "Exiting...";
-    Sleep(3600);
 }
