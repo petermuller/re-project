@@ -49,6 +49,8 @@ int main()
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
+    //clear recvbug
+    ZeroMemory(&recvbuf,DEF_BUFF_SIZE);
 
     // Resolve the server address and port
     iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
@@ -157,7 +159,7 @@ int main()
             WSACleanup();
             return 1;
         }
-
+        ZeroMemory(&recvbuf,DEF_BUFF_SIZE);
     } while (iResult > 0);
 
     // shutdown the connection since we're done
