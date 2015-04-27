@@ -107,6 +107,7 @@ int main()
             buffer = std::string(recvbuf);
             if(buffer.length()>0){
                 std::string token;
+                command = "";
                 command = code.decode(buffer);
                 std::stringstream ss(command);
                 std::getline(ss,token,'~');
@@ -132,7 +133,7 @@ int main()
                         output = code.encode(serv.listSongs());
                         break;
                     case 7:
-                        output = code.encode(serv.addSong(command.substr(3)));
+                        output = code.encode(serv.addSong(command.substr(2)));
                         break;
                     default:
                         output = code.encode(serv.playSong(""));

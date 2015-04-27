@@ -166,7 +166,7 @@ int main()
             string LengthStr(length);
             string AlbumStr(album);
 */
-            strMenuOption = "7~" + song + "~" + artist + "~" + length + "~" + album;
+            strMenuOption = "7~" + song + "~" + artist + "~" + length + "~" + album + "~";
             cout << "user input" << strMenuOption << endl << endl << endl;
 
         }else {//close socket

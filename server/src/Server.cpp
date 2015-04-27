@@ -49,13 +49,13 @@ Server::Server()
             ++counter;
         }
     }
+    infile.close();
 }
 
 Server::~Server()
 {
     //dtor
     //Cleanup database reader when done
-    infile.close();
 }
 
 /** \brief Adds a song entry to the database.
@@ -69,6 +69,7 @@ Server::~Server()
 std::string Server::addSong(std::string query){
     std:: string output = "true";
     std::string token;
+
     infile.open("database.txt",std::fstream::out | std::fstream::app);
     infile << query << std::endl;
     infile.close();
@@ -88,11 +89,14 @@ std::string Server::addSong(std::string query){
         case 3:
             albums.push_back(token);
             break;
+        case 4:
+            break;
         default:
             std::cerr << "Invalid input. Failing operation." << std::endl;
             output = "false";
             break;
         }
+        ++counter;
     }
     return output;
 }
