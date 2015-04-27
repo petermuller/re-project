@@ -16,7 +16,7 @@
 #include "Client.h"
 #include "Coding.h"
 
-#define DEF_BUFF_SIZE (1024)
+#define DEF_BUFF_SIZE (9216)
 #define DEFAULT_PORT "9001"
 
 #undef UNICODE
@@ -60,6 +60,8 @@ int main()
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
+    //Clear recvbuf
+    ZeroMemory(&recvbuf,DEF_BUFF_SIZE);
 
     // Resolve the server address and port
     iSendResult = getaddrinfo("127.0.0.1", DEFAULT_PORT, &hints, &result);
@@ -214,7 +216,7 @@ int main()
                 cout << "Decoding..." << endl;
                 ds = c.decode(recvbuf);
                 cout << "DS = " << ds;
-                continue;
+                ZeroMemory(&recvbuf,DEF_BUFF_SIZE);
             }
             //if ( iSendResult > 0 )
                // printf("Bytes received: %d\n", iSendResult);
