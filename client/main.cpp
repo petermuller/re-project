@@ -26,7 +26,9 @@ using namespace std;
 
 int main()
 {   //variable declarations
+    Coding code;
     WSAData wsaData; //winsock
+    string buffer, command, output;
     struct addrinfo *result, *ptr = NULL; //addresses
     struct addrinfo hints;
     char sendbuf = NULL;
@@ -36,7 +38,6 @@ int main()
     string strMenuOption;
     SOCKET ListenSocket = INVALID_SOCKET; //Sockets
     SOCKET ClientSocket = INVALID_SOCKET;
-
     //variables for menu
     long menuOption = 99;       // option entered
     string es, ds;              //variables for (e)ncode and (d)ecode strings
@@ -44,13 +45,6 @@ int main()
     cout << "opening socket!" << endl;
 
     //request listening socket from server (winsock client) add library libws2_32.a <-winsoc library
-
-    //Validate the parameters
-/*    if (argc != 2) {
-        printf("usage: %s ArmBand Technologies\n", argv[0]);
-        return 1;
-    }
-*/
 
 
  // Initialize Winsock
@@ -76,7 +70,7 @@ int main()
         return 1;
     }
 
-// Attempt to connect to an address until one succeeds
+    // Attempt to connect to an address until one succeeds
     for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
 
         // Create a SOCKET for connecting to server
@@ -111,6 +105,7 @@ int main()
     //******************
     //MENU OPTIONS HERE
     //******************
+
     while (menuOption > 0){
          //list the menu
         cout << "Menu: " <<  endl;
@@ -132,35 +127,59 @@ int main()
         cin >> menuOption;
         cout << endl;
 
+        cout << "You entered option= " << menuOption << endl;
+        cin.ignore();
 
-        if (menuOption==7){
-            string song, artist, lenght, album;
+        if ((menuOption==1)|| (menuOption==2) || (menuOption==3) || (menuOption==4) ||
+                  (menuOption==5) || (menuOption==6)){
+            //convert number to string
+            std::ostringstream ss;  //string variable
+            ss << menuOption;       //convert long to string
+            strMenuOption = ss.str(); //load it into variable to use throughout the project
+            //test the string variable
+            cout << "This is the menu option you chose: ";
+            cout << strMenuOption << endl;
+
+        }else if (menuOption==7){
+            string song, artist, length, album;
             cout << "Thank you for adding to our database!" << endl;
             cout << "Please enter the following information" << endl;
+
             cout << "Song: ";
-            cin >> song;
+            getline (cin, song);
+            //cout << "You inputed: " << song << endl;
+
             cout << endl << "Artist: ";
-            cin >> artist;
+            getline (cin,artist);
+            //cout << "You inputed: " << artist << endl;
+
             cout << endl << "Length: ";
-            cin >> lenght;
+            getline (cin,length);
+            //cout << "You inputed: " << length << endl;
+
             cout << endl << "Album: ";
-            cin >> album;
+            getline (cin,album);
+            //cout << "You inputed: " << album << endl;
 
-            strMenuOption = "7~" + song + "~" + artist + "~" + lenght + "~" + album;
-            cout << "user input" << strMenuOption;
-            //error checking slot
-            //we don't do error checking here.
+           /* string SongStr(song);
+            string ArtistStr(artist);
+            string LengthStr(length);
+            string AlbumStr(album);
+*/
+            strMenuOption = "7~" + song + "~" + artist + "~" + length + "~" + album;
+            cout << "user input" << strMenuOption << endl << endl << endl;
+
+        }else {//close socket
+            cout << "closing" << endl;
+            closesocket(ListenSocket);
+            WSACleanup();
+
+            cout << "Thank you for using ARMband Technologies!" << endl;
+            cout << "Exiting...";
+            Sleep(3600);
+
+            return 1;
         }
-
-        cout << "option= " << menuOption << endl;
-
-        //convert number to string
-        std::ostringstream ss;  //string variable
-        ss << menuOption;       //convert long to string
-        strMenuOption = ss.str(); //load it into variable to use throughout the project
-        //test the string variable
-        cout << "This is the menu option you chose: ";
-        cout << strMenuOption << '\n';
 
         //encode option
         cout << "Encoding...." << endl;
@@ -186,10 +205,40 @@ int main()
         printf("Bytes Sent: %d\n", iSendResult);
         Sleep(180);
 
-        //recieve from server (listening the
         cout << "Receiving!" << endl;
         Sleep (120);
+        //recieve from server
 
+        do{
+            cout << "Buffer is: " << iSendResult << endl;
+            iSendResult = recv(ListenSocket, recvbuf, recvbuflen, 0);
+            cout << "After, Buffer is..." << iSendResult << endl;
+            if (iSendResult > 0){
+                if(buffer.length()>0){
+                    int comNum;
+                    std::string token;
+                    command = code.decode(buffer);
+                    std::stringstream ss(command);
+                    std::getline(ss,token,'~');
+                    comNum = atoi(token.c_str());
+                    cout << "Received request number: " << comNum << endl;
+                }
+                cout << "Decoding..." << endl;
+                ds = c.decode(recvbuf);
+                cout << "Past the decode" << endl;
+                cout << "DS = " << ds;
+                continue;
+            }
+            //if ( iSendResult > 0 )
+               // printf("Bytes received: %d\n", iSendResult);
+            else if ( iSendResult == 0 )
+                printf("Connection closed\n");
+            else
+                printf("recv failed with error: %d\n", WSAGetLastError());
+        }
+        while( iSendResult > 0 );
+
+        cout << "got to the decode";
         //decode
         cout << "Decoding..." << endl;
         ds = c.decode(es);
@@ -197,10 +246,10 @@ int main()
 
         cout << "decoded string is " << ds << endl;
         Sleep (3600);
-    }
+}//end While Loop
 
     // shutdown the connection since no more data will be sent
-    iSendResult = shutdown(ListenSocket, SD_SEND);
+    iSendResult = shutdown(ListenSocket,SD_SEND);
     if (iSendResult == SOCKET_ERROR) {
         printf("shutdown failed with error: %d\n", WSAGetLastError());
         closesocket(ListenSocket);
