@@ -236,7 +236,7 @@ int main()
             else
                 printf("recv failed with error: %d\n", WSAGetLastError());
         }
-        while( iSendResult > 0 );
+        while( iSendResult == DEF_BUFF_SIZE );
 
         cout << "got to the decode";
         //decode
