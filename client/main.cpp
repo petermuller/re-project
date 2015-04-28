@@ -29,6 +29,7 @@ int main()
     Coding code;
     WSAData wsaData; //winsock
     string buffer, command, output;
+    bool printMess;
     struct addrinfo *result, *ptr = NULL; //addresses
     struct addrinfo hints;
     char sendbuf = NULL;
@@ -140,8 +141,6 @@ int main()
 
             cout << "Thank you for using ARMband Technologies!" << endl;
             cout << "Exiting...";
-            Sleep(3600);
-
             return 1;
 
         }else if (menuOption==7){
@@ -181,18 +180,11 @@ int main()
         }
 
         //encode option
-        cout << "Encoding...." << endl;
         es = c.encode(strMenuOption);
-        //cout << "      Encoded string is: " << es << endl;
         Sleep(120);
 
-        //send to server
-        cout << "----Sending to server....Waiting----" << endl;
-
-
-        //cout << " Sending in buffer =" << es.c_str() << endl;
-
-        // Send an initial buffer -----> look at additional code?
+        //Send to server
+        //Send an initial buffer -----> look at additional code?
         iSendResult = send( ListenSocket, es.c_str(), es.length(), 0 );
         if (iSendResult == SOCKET_ERROR) {
             printf("send failed with error: %d\n", WSAGetLastError());
@@ -200,12 +192,6 @@ int main()
             WSACleanup();
             return 1;
         }
-
-        printf("Bytes Sent: %d\n", iSendResult);
-        Sleep(180);
-
-        cout << "Receiving!" << endl;
-        Sleep (120);
         //recieve from server
 
         do{
@@ -213,10 +199,19 @@ int main()
             iSendResult = recv(ListenSocket, recvbuf, recvbuflen, 0);
             //cout << "After, Buffer is..." << iSendResult << endl;
             if (iSendResult > 0){
-                cout << "Decoding..." << endl;
                 ds = c.decode(recvbuf);
-                cout << "DS = " << ds;
-                ZeroMemory(&recvbuf,DEF_BUFF_SIZE);
+                if (menuOption==7){
+                    if (printMess=false){
+                        cout << "Error: Please retry your command"<< endl;
+                    }else if(printMess = true){
+                        cout << endl << endl << "Your song information has been added successfully!" << endl ;
+                        ZeroMemory(&recvbuf,DEF_BUFF_SIZE);
+                    }
+                }else{
+                    cout << ds;
+                    ZeroMemory(&recvbuf,DEF_BUFF_SIZE);
+                }
+
             }
             //if ( iSendResult > 0 )
                // printf("Bytes received: %d\n", iSendResult);
