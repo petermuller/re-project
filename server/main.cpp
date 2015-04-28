@@ -22,6 +22,7 @@ using namespace std;
 
 int main()
 {
+    cout << "Server started. Listening for connections." << endl;
     //Application specific variables
     Server serv;
     Coding code;
